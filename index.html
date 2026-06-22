@@ -9,7 +9,6 @@
 <title>Bills</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     --bg: #0d0d0f;
     --surface: #16161a;
@@ -32,301 +31,245 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
   }
-
   html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
+    height: 100%; background: var(--bg); color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-    font-size: 16px;
-    -webkit-font-smoothing: antialiased;
+    font-size: 16px; -webkit-font-smoothing: antialiased;
   }
+  .app { max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
 
-  .app {
-    max-width: 480px;
-    margin: 0 auto;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
+  /* ── Login screen ── */
+  .login-screen {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 28px calc(var(--safe-bottom) + 40px);
   }
+  .login-logo { font-size: 48px; margin-bottom: 12px; }
+  .login-title { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .login-sub { font-size: 14px; color: var(--text2); margin-bottom: 36px; }
+  .login-form { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+  .login-field { display: flex; flex-direction: column; gap: 6px; }
+  .login-field label { font-size: 13px; color: var(--text2); font-weight: 500; }
+  .login-field input {
+    background: var(--surface); border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    font-size: 16px; color: var(--text); outline: none; width: 100%;
+  }
+  .login-field input:focus { border-color: var(--accent); }
+  .login-error { font-size: 13px; color: var(--red); text-align: center; min-height: 18px; }
+  .btn-login {
+    width: 100%; background: var(--accent); color: var(--accent-text);
+    border: none; border-radius: var(--radius-sm); padding: 15px;
+    font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-login:active { opacity: 0.85; }
+  .spinner {
+    width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 0.7s linear infinite; display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Header */
+  /* ── Main app ── */
+  .main-screen { display: none; flex-direction: column; flex: 1; }
   .header {
     padding: calc(var(--safe-top) + 20px) 20px 16px;
-    background: var(--bg);
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    background: var(--bg); position: sticky; top: 0; z-index: 10;
     border-bottom: 0.5px solid var(--border);
   }
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .header-left { display: flex; align-items: baseline; gap: 10px; }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .user-badge {
+    font-size: 12px; color: var(--text3); background: var(--surface2);
+    padding: 3px 8px; border-radius: 20px; border: 0.5px solid var(--border);
   }
-  .header h1 {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-  }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
   .add-btn {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: var(--accent-text);
-    border: none;
-    font-size: 22px;
-    line-height: 1;
-    cursor: pointer;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--accent); color: var(--accent-text);
+    border: none; font-size: 22px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
   }
   .add-btn:active { transform: scale(0.93); }
+  .logout-btn {
+    background: none; border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-sm); padding: 6px 12px;
+    font-size: 13px; color: var(--text2); cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .logout-btn:active { background: var(--surface2); }
 
-  /* Summary pills */
-  .summary {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-  .stat {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 12px;
-    text-align: center;
-  }
+  /* Summary */
+  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; text-align: center; }
   .stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
   .stat-val { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
   .stat-val.red { color: var(--red); }
   .stat-val.green { color: var(--green); }
 
   /* Filters */
-  .filters {
-    display: flex;
-    gap: 8px;
-    padding: 14px 20px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
+  .filters { display: flex; gap: 8px; padding: 14px 20px 0; overflow-x: auto; scrollbar-width: none; }
   .filters::-webkit-scrollbar { display: none; }
   .filter-btn {
-    flex-shrink: 0;
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text2);
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: background 0.15s;
+    flex-shrink: 0; background: var(--surface); border: 0.5px solid var(--border);
+    border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500;
+    color: var(--text2); cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
-  .filter-btn.active {
-    background: var(--accent);
-    color: var(--accent-text);
-    border-color: var(--accent);
-  }
+  .filter-btn.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 
-  /* Bills list */
+  /* List */
   .list-wrap {
-    flex: 1;
-    padding: 14px 20px calc(var(--safe-bottom) + 20px);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex: 1; padding: 14px 20px calc(var(--safe-bottom) + 20px);
+    display: flex; flex-direction: column; gap: 10px; overflow-y: auto;
   }
-  .empty {
-    text-align: center;
-    color: var(--text3);
-    font-size: 15px;
-    padding: 60px 0;
-  }
+  .empty { text-align: center; color: var(--text3); font-size: 15px; padding: 60px 0; }
   .empty p:first-child { font-size: 32px; margin-bottom: 8px; }
+  .section-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin: 4px 4px 4px; }
+  .sync-bar { font-size: 12px; color: var(--text3); text-align: center; padding: 8px; }
 
   /* Bill card */
   .bill-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    -webkit-tap-highlight-color: transparent;
+    background: var(--surface); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+    -webkit-tap-highlight-color: transparent; cursor: pointer;
   }
   .bill-card.overdue { border-left: 3px solid var(--red); }
-  .bill-card.paid { opacity: 0.55; }
-
+  .bill-card.paid { opacity: 0.5; }
   .bill-icon {
-    width: 40px; height: 40px;
-    border-radius: 10px;
-    background: var(--surface2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 19px;
-    flex-shrink: 0;
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--surface2); display: flex; align-items: center;
+    justify-content: center; font-size: 19px; flex-shrink: 0;
   }
-
   .bill-info { flex: 1; min-width: 0; }
   .bill-name { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .bill-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
   .bill-right { text-align: right; flex-shrink: 0; }
   .bill-amount { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
-  .badge {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 20px;
-    margin-top: 4px;
-  }
+  .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; margin-top: 4px; }
   .badge-paid { background: var(--green-bg); color: var(--green); }
   .badge-due { background: var(--amber-bg); color: var(--amber); }
   .badge-overdue { background: var(--red-bg); color: var(--red); }
 
-  /* Bottom sheet modal */
+  /* Overlay / sheet */
   .overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 100;
-    align-items: flex-end;
-    justify-content: center;
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 100;
+    align-items: flex-end; justify-content: center;
   }
   .overlay.open { display: flex; }
-
   .sheet {
-    background: var(--surface);
-    border-radius: 20px 20px 0 0;
+    background: var(--surface); border-radius: 20px 20px 0 0;
     padding: 20px 20px calc(var(--safe-bottom) + 24px);
-    width: 100%;
-    max-width: 480px;
-    max-height: 92dvh;
-    overflow-y: auto;
+    width: 100%; max-width: 480px; max-height: 92dvh; overflow-y: auto;
   }
-  .sheet-handle {
-    width: 36px; height: 4px;
-    background: var(--border-med);
-    border-radius: 2px;
-    margin: 0 auto 20px;
-  }
+  .sheet-handle { width: 36px; height: 4px; background: var(--border-med); border-radius: 2px; margin: 0 auto 20px; }
   .sheet h2 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
 
   /* Form */
   .field { margin-bottom: 14px; }
   .field label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
   .field input, .field select {
-    width: 100%;
-    background: var(--surface2);
-    border: 0.5px solid var(--border-med);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    font-size: 16px;
-    color: var(--text);
-    -webkit-appearance: none;
-    appearance: none;
-    outline: none;
+    width: 100%; background: var(--surface2); border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    font-size: 16px; color: var(--text); -webkit-appearance: none; outline: none;
   }
   .field input:focus, .field select:focus { border-color: var(--accent); }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
   .form-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
   .btn-save {
-    width: 100%;
-    background: var(--accent);
-    color: var(--accent-text);
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 15px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
+    width: 100%; background: var(--accent); color: var(--accent-text);
+    border: none; border-radius: var(--radius-sm); padding: 15px;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .btn-save:active { opacity: 0.8; }
   .btn-cancel {
-    width: 100%;
-    background: var(--surface2);
-    color: var(--text2);
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 15px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
+    width: 100%; background: var(--surface2); color: var(--text2);
+    border: none; border-radius: var(--radius-sm); padding: 15px;
+    font-size: 16px; font-weight: 500; cursor: pointer;
   }
 
-  /* Bill detail sheet */
+  /* Detail sheet */
   .detail-name { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 4px; }
   .detail-amount { font-size: 36px; font-weight: 700; letter-spacing: -1px; margin-bottom: 16px; }
   .detail-rows { border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 20px; }
-  .detail-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 14px;
-    font-size: 15px;
-    border-bottom: 0.5px solid var(--border);
-  }
+  .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; font-size: 15px; border-bottom: 0.5px solid var(--border); }
   .detail-row:last-child { border-bottom: none; }
   .detail-row-label { color: var(--text2); }
   .detail-row-val { font-weight: 500; }
   .btn-pay {
-    width: 100%;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 15px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 10px;
-    -webkit-tap-highlight-color: transparent;
+    width: 100%; border: none; border-radius: var(--radius-sm); padding: 15px;
+    font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .btn-pay.mark-paid { background: var(--green-bg); color: var(--green); }
   .btn-pay.mark-unpaid { background: var(--amber-bg); color: var(--amber); }
-  .btn-delete {
-    width: 100%;
-    background: var(--red-bg);
-    color: var(--red);
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 15px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
+  .btn-delete { width: 100%; background: var(--red-bg); color: var(--red); border: none; border-radius: var(--radius-sm); padding: 15px; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .loading-overlay {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px; z-index: 200;
   }
-  .section-label {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text3);
-    margin: 0 4px 8px;
-  }
+  .loading-overlay .spinner { display: block; width: 28px; height: 28px; border-color: var(--border-med); border-top-color: var(--accent); }
+  .loading-overlay p { font-size: 14px; color: var(--text2); }
 </style>
 </head>
 <body>
 
-<div class="app">
+<div id="loading-overlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <p>Loading…</p>
+</div>
+
+<!-- Login -->
+<div class="app" id="login-screen" style="display:none;">
+  <div class="login-screen">
+    <div class="login-logo">💸</div>
+    <div class="login-title">Bills</div>
+    <div class="login-sub">Sign in to access your bills</div>
+    <div class="login-form">
+      <div class="login-field">
+        <label>Username</label>
+        <input type="text" id="l-user" autocomplete="username" autocapitalize="none" placeholder="your username" />
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="l-pass" autocomplete="current-password" placeholder="••••••••" />
+      </div>
+      <div class="login-error" id="login-error"></div>
+      <button class="btn-login" id="login-btn">
+        <div class="spinner" id="login-spinner"></div>
+        <span id="login-label">Sign in</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Main app -->
+<div class="app main-screen" id="main-screen">
   <div class="header">
     <div class="header-top">
-      <h1>Bills</h1>
-      <button class="add-btn" id="open-add" aria-label="Add bill">+</button>
+      <div class="header-left">
+        <h1>Bills</h1>
+        <span class="user-badge" id="user-badge"></span>
+      </div>
+      <div class="header-actions">
+        <button class="logout-btn" id="logout-btn">Sign out</button>
+        <button class="add-btn" id="open-add" aria-label="Add bill">+</button>
+      </div>
     </div>
     <div class="summary" id="summary"></div>
   </div>
-
   <div class="filters" id="filters">
     <button class="filter-btn active" data-filter="all">All</button>
     <button class="filter-btn" data-filter="upcoming">Upcoming</button>
     <button class="filter-btn" data-filter="overdue">Overdue</button>
     <button class="filter-btn" data-filter="paid">Paid</button>
   </div>
-
   <div class="list-wrap" id="list"></div>
 </div>
 
@@ -347,12 +290,8 @@
       <div class="field">
         <label>Category</label>
         <select id="f-cat">
-          <option>Utilities</option>
-          <option>Housing</option>
-          <option>Insurance</option>
-          <option>Subscriptions</option>
-          <option>Loans</option>
-          <option>Other</option>
+          <option>Utilities</option><option>Housing</option><option>Insurance</option>
+          <option>Subscriptions</option><option>Loans</option><option>Other</option>
         </select>
       </div>
     </div>
@@ -372,78 +311,136 @@
       </div>
     </div>
     <div class="form-actions">
-      <button class="btn-save" id="save-bill">Save bill</button>
+      <button class="btn-save" id="save-bill"><div class="spinner" id="save-spinner"></div><span>Save bill</span></button>
       <button class="btn-cancel" id="cancel-add">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- Bill detail sheet -->
+<!-- Detail sheet -->
 <div class="overlay" id="detail-overlay">
   <div class="sheet" id="detail-content"></div>
 </div>
 
 <script>
-const STORAGE_KEY = 'bills_v1';
+const API = 'https://script.google.com/macros/s/AKfycbywlYfknj3nVONRtGjt5HQoWKm8bOvV5QVWJj8KmECE2qOzo0IPsI6K83YB1IkYGCCs4A/exec';
+const CAT_ICONS = { Utilities:'💡', Housing:'🏠', Insurance:'🛡️', Subscriptions:'📱', Loans:'💳', Other:'📋' };
+
 const TODAY = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
 const ymd = d => d.toISOString().split('T')[0];
-const parseDate = s => { const d=new Date(s+'T00:00:00'); return d; };
+const parseDate = s => new Date(s+'T00:00:00');
 const daysDiff = s => Math.round((parseDate(s)-TODAY())/86400000);
+const fmt = n => '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 
-const CAT_ICONS = {
-  Utilities:'💡', Housing:'🏠', Insurance:'🛡️', Subscriptions:'📱', Loans:'💳', Other:'📋'
-};
-
-function load(){
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-  catch(e){ return []; }
-}
-function save(bills){ localStorage.setItem(STORAGE_KEY, JSON.stringify(bills)); }
-
-let bills = load();
-let nextId = bills.length ? Math.max(...bills.map(b=>b.id))+1 : 1;
+let currentUser = null;
+let bills = [];
 let activeFilter = 'all';
 let detailId = null;
 
-function status(b){
-  if(b.paidDate) return 'paid';
-  return daysDiff(b.due) < 0 ? 'overdue' : 'upcoming';
+async function api(payload) {
+  const res = await fetch(API, {
+    method: 'POST', body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'text/plain' }
+  });
+  return res.json();
 }
 
-function dueLabel(b){
-  if(b.paidDate) return 'Paid ' + b.paidDate;
+function status(b) {
+  if (b.paidDate) return 'paid';
+  return daysDiff(b.due) < 0 ? 'overdue' : 'upcoming';
+}
+function dueLabel(b) {
+  if (b.paidDate) return 'Paid ' + b.paidDate;
   const d = daysDiff(b.due);
-  if(d===0) return 'Due today';
-  if(d<0) return Math.abs(d)+' day'+(Math.abs(d)!==1?'s':'')+' overdue';
+  if (d===0) return 'Due today';
+  if (d<0) return Math.abs(d)+' day'+(Math.abs(d)!==1?'s':'')+' overdue';
   return 'Due in '+d+' day'+(d!==1?'s':'');
 }
 
-function fmt(n){ return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+// ── Auth ──
+function getSavedUser() {
+  try { return JSON.parse(sessionStorage.getItem('bills_user')); } catch(e) { return null; }
+}
+function setSavedUser(u) { sessionStorage.setItem('bills_user', JSON.stringify(u)); }
+function clearSavedUser() { sessionStorage.removeItem('bills_user'); }
 
-function renderSummary(){
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('l-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+async function doLogin() {
+  const username = document.getElementById('l-user').value.trim();
+  const password = document.getElementById('l-pass').value;
+  if (!username || !password) { document.getElementById('login-error').textContent = 'Enter your username and password.'; return; }
+  setLoginLoading(true);
+  document.getElementById('login-error').textContent = '';
+  try {
+    const res = await api({ action: 'login', username, password });
+    if (res.ok) {
+      currentUser = username;
+      setSavedUser({ username });
+      await loadBills();
+      showMain();
+    } else {
+      document.getElementById('login-error').textContent = res.error || 'Sign in failed.';
+    }
+  } catch(e) {
+    document.getElementById('login-error').textContent = 'Connection error. Try again.';
+  }
+  setLoginLoading(false);
+}
+
+function setLoginLoading(on) {
+  document.getElementById('login-spinner').style.display = on ? 'block' : 'none';
+  document.getElementById('login-label').textContent = on ? 'Signing in…' : 'Sign in';
+  document.getElementById('login-btn').disabled = on;
+}
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  clearSavedUser();
+  currentUser = null;
+  bills = [];
+  document.getElementById('main-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('l-pass').value = '';
+  document.getElementById('login-error').textContent = '';
+});
+
+// ── Data ──
+async function loadBills() {
+  const res = await api({ action: 'getBills', username: currentUser });
+  if (res.ok) bills = res.bills;
+}
+
+function showMain() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'flex';
+  document.getElementById('user-badge').textContent = currentUser;
+  render();
+}
+
+// ── Render ──
+function renderSummary() {
   const total = bills.reduce((s,b)=>s+Number(b.amount),0);
   const owed = bills.filter(b=>!b.paidDate).reduce((s,b)=>s+Number(b.amount),0);
   const overdue = bills.filter(b=>status(b)==='overdue').length;
   document.getElementById('summary').innerHTML = `
     <div class="stat"><div class="stat-label">Total</div><div class="stat-val">${fmt(total)}</div></div>
     <div class="stat"><div class="stat-label">Owed</div><div class="stat-val ${owed>0?'red':'green'}">${fmt(owed)}</div></div>
-    <div class="stat"><div class="stat-label">Overdue</div><div class="stat-val ${overdue>0?'red':'green'}">${overdue}</div></div>
-  `;
+    <div class="stat"><div class="stat-label">Overdue</div><div class="stat-val ${overdue>0?'red':'green'}">${overdue}</div></div>`;
 }
 
-function filtered(){
-  if(activeFilter==='all') return bills;
-  return bills.filter(b=>status(b)===activeFilter);
+function filtered() {
+  return activeFilter==='all' ? bills : bills.filter(b=>status(b)===activeFilter);
 }
 
-function renderList(){
+function renderList() {
   const list = filtered();
   const el = document.getElementById('list');
-  if(!list.length){
+  if (!list.length) {
     el.innerHTML = `<div class="empty"><p>📭</p><p>${activeFilter==='all'?'No bills yet. Tap + to add one.':'No '+activeFilter+' bills.'}</p></div>`;
     return;
   }
-  const sorted = [...list].sort((a,b)=>{
+  const sorted = [...list].sort((a,b) => {
     const sa=status(a), sb=status(b);
     if(sa==='overdue'&&sb!=='overdue') return -1;
     if(sb==='overdue'&&sa!=='overdue') return 1;
@@ -452,17 +449,17 @@ function renderList(){
     return parseDate(a.due)-parseDate(b.due);
   });
   const groups = {};
-  sorted.forEach(b=>{
+  sorted.forEach(b => {
     const month = b.due.slice(0,7);
     if(!groups[month]) groups[month]=[];
     groups[month].push(b);
   });
   let html = '';
-  Object.keys(groups).sort().forEach(month=>{
+  Object.keys(groups).sort().forEach(month => {
     const [y,m] = month.split('-');
     const label = new Date(Number(y),Number(m)-1,1).toLocaleString('en-US',{month:'long',year:'numeric'});
     html += `<div class="section-label">${label}</div>`;
-    groups[month].forEach(b=>{
+    groups[month].forEach(b => {
       const s = status(b);
       const badgeClass = s==='paid'?'badge-paid':s==='overdue'?'badge-overdue':'badge-due';
       const badgeText = s==='paid'?'Paid':s==='overdue'?'Overdue':'Upcoming';
@@ -482,32 +479,30 @@ function renderList(){
   el.innerHTML = html;
 }
 
-function render(){ renderSummary(); renderList(); }
+function render() { renderSummary(); renderList(); }
 
-// Filters
-document.getElementById('filters').addEventListener('click', e=>{
+// ── Filters ──
+document.getElementById('filters').addEventListener('click', e => {
   const btn = e.target.closest('.filter-btn');
   if(!btn) return;
   activeFilter = btn.dataset.filter;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active', b===btn));
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b===btn));
   renderList();
 });
 
-// Tap bill → detail sheet
-document.getElementById('list').addEventListener('click', e=>{
+// ── Bill detail ──
+document.getElementById('list').addEventListener('click', e => {
   const card = e.target.closest('.bill-card');
   if(!card) return;
-  detailId = parseInt(card.dataset.id);
+  detailId = card.dataset.id;
   openDetail();
 });
 
-function openDetail(){
-  const b = bills.find(x=>x.id===detailId);
+function openDetail() {
+  const b = bills.find(x=>x.id==detailId);
   if(!b) return;
   const s = status(b);
   const recurLabel = b.recur==='none'?'One-time':b.recur.charAt(0).toUpperCase()+b.recur.slice(1);
-  const d = daysDiff(b.due);
-  let dLabel = dueLabel(b);
   document.getElementById('detail-content').innerHTML = `
     <div class="sheet-handle"></div>
     <div class="detail-name">${b.name}</div>
@@ -515,63 +510,97 @@ function openDetail(){
     <div class="detail-rows">
       <div class="detail-row"><span class="detail-row-label">Category</span><span class="detail-row-val">${CAT_ICONS[b.cat]||''} ${b.cat}</span></div>
       <div class="detail-row"><span class="detail-row-label">Due date</span><span class="detail-row-val">${b.due}</span></div>
-      <div class="detail-row"><span class="detail-row-label">Status</span><span class="detail-row-val">${dLabel}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Status</span><span class="detail-row-val">${dueLabel(b)}</span></div>
       <div class="detail-row"><span class="detail-row-label">Repeats</span><span class="detail-row-val">${recurLabel}</span></div>
       ${b.paidDate?`<div class="detail-row"><span class="detail-row-label">Paid on</span><span class="detail-row-val">${b.paidDate}</span></div>`:''}
     </div>
     <button class="btn-pay ${s==='paid'?'mark-unpaid':'mark-paid'}" id="toggle-paid">
-      ${s==='paid'?'Mark as unpaid':'Mark as paid'}
+      <div class="spinner" id="pay-spinner"></div>
+      <span>${s==='paid'?'Mark as unpaid':'Mark as paid'}</span>
     </button>
-    <button class="btn-delete" id="delete-bill">Delete bill</button>
-  `;
+    <button class="btn-delete" id="delete-bill">Delete bill</button>`;
   document.getElementById('detail-overlay').classList.add('open');
-  document.getElementById('toggle-paid').addEventListener('click',()=>{
-    const bill = bills.find(x=>x.id===detailId);
-    bill.paidDate = bill.paidDate ? null : ymd(TODAY());
-    save(bills); render(); openDetail();
+
+  document.getElementById('toggle-paid').addEventListener('click', async () => {
+    const bill = bills.find(x=>x.id==detailId);
+    const newPaid = bill.paidDate ? '' : ymd(TODAY());
+    document.getElementById('pay-spinner').style.display = 'block';
+    document.getElementById('toggle-paid').disabled = true;
+    const updated = {...bill, paidDate: newPaid};
+    const res = await api({ action: 'updateBill', username: currentUser, id: detailId, bill: updated });
+    if (res.ok) { bill.paidDate = newPaid; render(); openDetail(); }
+    else { alert('Could not update. Try again.'); }
+    document.getElementById('pay-spinner').style.display = 'none';
   });
-  document.getElementById('delete-bill').addEventListener('click',()=>{
-    if(!confirm('Delete "'+bills.find(x=>x.id===detailId).name+'"?')) return;
-    bills = bills.filter(x=>x.id!==detailId);
-    save(bills); render();
-    document.getElementById('detail-overlay').classList.remove('open');
+
+  document.getElementById('delete-bill').addEventListener('click', async () => {
+    const bill = bills.find(x=>x.id==detailId);
+    if (!confirm(`Delete "${bill.name}"?`)) return;
+    const res = await api({ action: 'deleteBill', username: currentUser, id: detailId });
+    if (res.ok) {
+      bills = bills.filter(x=>x.id!=detailId);
+      render();
+      document.getElementById('detail-overlay').classList.remove('open');
+    } else { alert('Could not delete. Try again.'); }
   });
 }
 
-// Overlay close on backdrop tap
-['add-overlay','detail-overlay'].forEach(id=>{
-  document.getElementById(id).addEventListener('click', e=>{
+// ── Overlays ──
+['add-overlay','detail-overlay'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
     if(e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open');
   });
 });
 
-// Add bill
-document.getElementById('open-add').addEventListener('click',()=>{
+// ── Add bill ──
+document.getElementById('open-add').addEventListener('click', () => {
   document.getElementById('f-due').value = ymd(TODAY());
   document.getElementById('add-overlay').classList.add('open');
   setTimeout(()=>document.getElementById('f-name').focus(), 300);
 });
-document.getElementById('cancel-add').addEventListener('click',()=>{
+document.getElementById('cancel-add').addEventListener('click', () => {
   document.getElementById('add-overlay').classList.remove('open');
 });
-document.getElementById('save-bill').addEventListener('click',()=>{
+document.getElementById('save-bill').addEventListener('click', async () => {
   const name = document.getElementById('f-name').value.trim();
   const amount = parseFloat(document.getElementById('f-amount').value);
   const cat = document.getElementById('f-cat').value;
   const due = document.getElementById('f-due').value;
   const recur = document.getElementById('f-recur').value;
-  if(!name || isNaN(amount) || amount<=0 || !due){
-    alert('Please fill in name, a valid amount, and due date.');
-    return;
-  }
-  bills.push({ id: nextId++, name, amount, cat, due, recur, paidDate: null });
-  save(bills); render();
-  document.getElementById('add-overlay').classList.remove('open');
-  document.getElementById('f-name').value='';
-  document.getElementById('f-amount').value='';
+  if (!name || isNaN(amount) || amount<=0 || !due) { alert('Please fill in name, amount, and due date.'); return; }
+  document.getElementById('save-spinner').style.display = 'block';
+  document.getElementById('save-bill').disabled = true;
+  const res = await api({ action: 'saveBill', username: currentUser, bill: { name, amount, cat, due, recur } });
+  if (res.ok) {
+    bills.push({ id: res.id, username: currentUser, name, amount, cat, due, recur, paidDate: '' });
+    render();
+    document.getElementById('add-overlay').classList.remove('open');
+    document.getElementById('f-name').value='';
+    document.getElementById('f-amount').value='';
+  } else { alert('Could not save bill. Try again.'); }
+  document.getElementById('save-spinner').style.display = 'none';
+  document.getElementById('save-bill').disabled = false;
 });
 
-render();
+// ── Boot ──
+async function boot() {
+  const saved = getSavedUser();
+  if (saved) {
+    currentUser = saved.username;
+    try {
+      await loadBills();
+      showMain();
+    } catch(e) {
+      clearSavedUser();
+      document.getElementById('login-screen').style.display = 'flex';
+    }
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+  document.getElementById('loading-overlay').style.display = 'none';
+}
+
+boot();
 </script>
 </body>
 </html>

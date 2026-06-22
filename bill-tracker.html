@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Bills" />
+<title>Bills</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --surface2: #f0efed;
+    --border: rgba(0,0,0,0.09);
+    --border-med: rgba(0,0,0,0.15);
+    --text: #1a1a18;
+    --text2: #6b6b65;
+    --text3: #a0a09a;
+    --accent: #1a1a18;
+    --green: #1e7f4e;
+    --green-bg: #eaf5ee;
+    --amber: #8a5a00;
+    --amber-bg: #fef5e0;
+    --red: #c0291e;
+    --red-bg: #fdecea;
+    --radius: 14px;
+    --radius-sm: 9px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111110;
+      --surface: #1c1c1a;
+      --surface2: #252523;
+      --border: rgba(255,255,255,0.08);
+      --border-med: rgba(255,255,255,0.14);
+      --text: #f0efe9;
+      --text2: #9a9a92;
+      --text3: #5a5a54;
+      --accent: #f0efe9;
+      --green: #4ade86;
+      --green-bg: #0d2e1c;
+      --amber: #f0b429;
+      --amber-bg: #2a1f00;
+      --red: #f56a63;
+      --red-bg: #2d0e0c;
+    }
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .header {
+    padding: calc(var(--safe-top) + 20px) 20px 16px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .add-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .add-btn:active { transform: scale(0.93); }
+
+  /* Summary pills */
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .stat {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+  .stat-val { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .stat-val.red { color: var(--red); }
+  .stat-val.green { color: var(--green); }
+
+  /* Filters */
+  .filters {
+    display: flex;
+    gap: 8px;
+    padding: 14px 20px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-btn {
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s;
+  }
+  .filter-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  /* Bills list */
+  .list-wrap {
+    flex: 1;
+    padding: 14px 20px calc(var(--safe-bottom) + 20px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .empty {
+    text-align: center;
+    color: var(--text3);
+    font-size: 15px;
+    padding: 60px 0;
+  }
+  .empty p:first-child { font-size: 32px; margin-bottom: 8px; }
+
+  /* Bill card */
+  .bill-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bill-card.overdue { border-left: 3px solid var(--red); }
+  .bill-card.paid { opacity: 0.55; }
+
+  .bill-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+  }
+
+  .bill-info { flex: 1; min-width: 0; }
+  .bill-name { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bill-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  .bill-right { text-align: right; flex-shrink: 0; }
+  .bill-amount { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 4px;
+  }
+  .badge-paid { background: var(--green-bg); color: var(--green); }
+  .badge-due { background: var(--amber-bg); color: var(--amber); }
+  .badge-overdue { background: var(--red-bg); color: var(--red); }
+
+  /* Bottom sheet modal */
+  .overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .overlay.open { display: flex; }
+
+  .sheet {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 20px calc(var(--safe-bottom) + 24px);
+    width: 100%;
+    max-width: 480px;
+    max-height: 92dvh;
+    overflow-y: auto;
+  }
+  .sheet-handle {
+    width: 36px; height: 4px;
+    background: var(--border-med);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  .sheet h2 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+
+  /* Form */
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+  .field input, .field select {
+    width: 100%;
+    background: var(--surface2);
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 16px;
+    color: var(--text);
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .form-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .btn-save {
+    width: 100%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-save:active { opacity: 0.8; }
+  .btn-cancel {
+    width: 100%;
+    background: var(--surface2);
+    color: var(--text2);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Bill detail sheet */
+  .detail-name { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 4px; }
+  .detail-amount { font-size: 36px; font-weight: 700; letter-spacing: -1px; margin-bottom: 16px; }
+  .detail-rows { border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 20px; }
+  .detail-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 14px;
+    font-size: 15px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row-label { color: var(--text2); }
+  .detail-row-val { font-weight: 500; }
+  .btn-pay {
+    width: 100%;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-pay.mark-paid { background: var(--green-bg); color: var(--green); }
+  .btn-pay.mark-unpaid { background: var(--amber-bg); color: var(--amber); }
+  .btn-delete {
+    width: 100%;
+    background: var(--red-bg);
+    color: var(--red);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text3);
+    margin: 0 4px 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <h1>Bills</h1>
+      <button class="add-btn" id="open-add" aria-label="Add bill">+</button>
+    </div>
+    <div class="summary" id="summary"></div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+    <button class="filter-btn" data-filter="overdue">Overdue</button>
+    <button class="filter-btn" data-filter="paid">Paid</button>
+  </div>
+
+  <div class="list-wrap" id="list"></div>
+</div>
+
+<!-- Add bill sheet -->
+<div class="overlay" id="add-overlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h2>New bill</h2>
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="f-name" placeholder="e.g. Electricity" autocomplete="off" />
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Amount ($)</label>
+        <input type="number" id="f-amount" placeholder="0.00" inputmode="decimal" step="0.01" min="0" />
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="f-cat">
+          <option>Utilities</option>
+          <option>Housing</option>
+          <option>Insurance</option>
+          <option>Subscriptions</option>
+          <option>Loans</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Due date</label>
+        <input type="date" id="f-due" />
+      </div>
+      <div class="field">
+        <label>Repeats</label>
+        <select id="f-recur">
+          <option value="none">One-time</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly" selected>Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-save" id="save-bill">Save bill</button>
+      <button class="btn-cancel" id="cancel-add">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bill detail sheet -->
+<div class="overlay" id="detail-overlay">
+  <div class="sheet" id="detail-content"></div>
+</div>
+
+<script>
+const STORAGE_KEY = 'bills_v1';
+const TODAY = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
+const ymd = d => d.toISOString().split('T')[0];
+const parseDate = s => { const d=new Date(s+'T00:00:00'); return d; };
+const daysDiff = s => Math.round((parseDate(s)-TODAY())/86400000);
+
+const CAT_ICONS = {
+  Utilities:'💡', Housing:'🏠', Insurance:'🛡️', Subscriptions:'📱', Loans:'💳', Other:'📋'
+};
+
+function load(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e){ return []; }
+}
+function save(bills){ localStorage.setItem(STORAGE_KEY, JSON.stringify(bills)); }
+
+let bills = load();
+let nextId = bills.length ? Math.max(...bills.map(b=>b.id))+1 : 1;
+let activeFilter = 'all';
+let detailId = null;
+
+function status(b){
+  if(b.paidDate) return 'paid';
+  return daysDiff(b.due) < 0 ? 'overdue' : 'upcoming';
+}
+
+function dueLabel(b){
+  if(b.paidDate) return 'Paid ' + b.paidDate;
+  const d = daysDiff(b.due);
+  if(d===0) return 'Due today';
+  if(d<0) return Math.abs(d)+' day'+(Math.abs(d)!==1?'s':'')+' overdue';
+  return 'Due in '+d+' day'+(d!==1?'s':'');
+}
+
+function fmt(n){ return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+function renderSummary(){
+  const total = bills.reduce((s,b)=>s+Number(b.amount),0);
+  const owed = bills.filter(b=>!b.paidDate).reduce((s,b)=>s+Number(b.amount),0);
+  const overdue = bills.filter(b=>status(b)==='overdue').length;
+  document.getElementById('summary').innerHTML = `
+    <div class="stat"><div class="stat-label">Total</div><div class="stat-val">${fmt(total)}</div></div>
+    <div class="stat"><div class="stat-label">Owed</div><div class="stat-val ${owed>0?'red':'green'}">${fmt(owed)}</div></div>
+    <div class="stat"><div class="stat-label">Overdue</div><div class="stat-val ${overdue>0?'red':'green'}">${overdue}</div></div>
+  `;
+}
+
+function filtered(){
+  if(activeFilter==='all') return bills;
+  return bills.filter(b=>status(b)===activeFilter);
+}
+
+function renderList(){
+  const list = filtered();
+  const el = document.getElementById('list');
+  if(!list.length){
+    el.innerHTML = `<div class="empty"><p>📭</p><p>${activeFilter==='all'?'No bills yet. Tap + to add one.':'No '+activeFilter+' bills.'}</p></div>`;
+    return;
+  }
+  const sorted = [...list].sort((a,b)=>{
+    const sa=status(a), sb=status(b);
+    if(sa==='overdue'&&sb!=='overdue') return -1;
+    if(sb==='overdue'&&sa!=='overdue') return 1;
+    if(sa==='paid'&&sb!=='paid') return 1;
+    if(sb==='paid'&&sa!=='paid') return -1;
+    return parseDate(a.due)-parseDate(b.due);
+  });
+  const groups = {};
+  sorted.forEach(b=>{
+    const month = b.due.slice(0,7);
+    if(!groups[month]) groups[month]=[];
+    groups[month].push(b);
+  });
+  let html = '';
+  Object.keys(groups).sort().forEach(month=>{
+    const [y,m] = month.split('-');
+    const label = new Date(Number(y),Number(m)-1,1).toLocaleString('en-US',{month:'long',year:'numeric'});
+    html += `<div class="section-label">${label}</div>`;
+    groups[month].forEach(b=>{
+      const s = status(b);
+      const badgeClass = s==='paid'?'badge-paid':s==='overdue'?'badge-overdue':'badge-due';
+      const badgeText = s==='paid'?'Paid':s==='overdue'?'Overdue':'Upcoming';
+      html += `<div class="bill-card ${s}" data-id="${b.id}">
+        <div class="bill-icon">${CAT_ICONS[b.cat]||'📋'}</div>
+        <div class="bill-info">
+          <div class="bill-name">${b.name}</div>
+          <div class="bill-sub">${dueLabel(b)}</div>
+        </div>
+        <div class="bill-right">
+          <div class="bill-amount">${fmt(b.amount)}</div>
+          <span class="badge ${badgeClass}">${badgeText}</span>
+        </div>
+      </div>`;
+    });
+  });
+  el.innerHTML = html;
+}
+
+function render(){ renderSummary(); renderList(); }
+
+// Filters
+document.getElementById('filters').addEventListener('click', e=>{
+  const btn = e.target.closest('.filter-btn');
+  if(!btn) return;
+  activeFilter = btn.dataset.filter;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active', b===btn));
+  renderList();
+});
+
+// Tap bill → detail sheet
+document.getElementById('list').addEventListener('click', e=>{
+  const card = e.target.closest('.bill-card');
+  if(!card) return;
+  detailId = parseInt(card.dataset.id);
+  openDetail();
+});
+
+function openDetail(){
+  const b = bills.find(x=>x.id===detailId);
+  if(!b) return;
+  const s = status(b);
+  const recurLabel = b.recur==='none'?'One-time':b.recur.charAt(0).toUpperCase()+b.recur.slice(1);
+  const d = daysDiff(b.due);
+  let dLabel = dueLabel(b);
+  document.getElementById('detail-content').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="detail-name">${b.name}</div>
+    <div class="detail-amount">${fmt(b.amount)}</div>
+    <div class="detail-rows">
+      <div class="detail-row"><span class="detail-row-label">Category</span><span class="detail-row-val">${CAT_ICONS[b.cat]||''} ${b.cat}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Due date</span><span class="detail-row-val">${b.due}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Status</span><span class="detail-row-val">${dLabel}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Repeats</span><span class="detail-row-val">${recurLabel}</span></div>
+      ${b.paidDate?`<div class="detail-row"><span class="detail-row-label">Paid on</span><span class="detail-row-val">${b.paidDate}</span></div>`:''}
+    </div>
+    <button class="btn-pay ${s==='paid'?'mark-unpaid':'mark-paid'}" id="toggle-paid">
+      ${s==='paid'?'Mark as unpaid':'Mark as paid'}
+    </button>
+    <button class="btn-delete" id="delete-bill">Delete bill</button>
+  `;
+  document.getElementById('detail-overlay').classList.add('open');
+  document.getElementById('toggle-paid').addEventListener('click',()=>{
+    const bill = bills.find(x=>x.id===detailId);
+    bill.paidDate = bill.paidDate ? null : ymd(TODAY());
+    save(bills); render(); openDetail();
+  });
+  document.getElementById('delete-bill').addEventListener('click',()=>{
+    if(!confirm('Delete "'+bills.find(x=>x.id===detailId).name+'"?')) return;
+    bills = bills.filter(x=>x.id!==detailId);
+    save(bills); render();
+    document.getElementById('detail-overlay').classList.remove('open');
+  });
+}
+
+// Overlay close on backdrop tap
+['add-overlay','detail-overlay'].forEach(id=>{
+  document.getElementById(id).addEventListener('click', e=>{
+    if(e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open');
+  });
+});
+
+// Add bill
+document.getElementById('open-add').addEventListener('click',()=>{
+  document.getElementById('f-due').value = ymd(TODAY());
+  document.getElementById('add-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(), 300);
+});
+document.getElementById('cancel-add').addEventListener('click',()=>{
+  document.getElementById('add-overlay').classList.remove('open');
+});
+document.getElementById('save-bill').addEventListener('click',()=>{
+  const name = document.getElementById('f-name').value.trim();
+  const amount = parseFloat(document.getElementById('f-amount').value);
+  const cat = document.getElementById('f-cat').value;
+  const due = document.getElementById('f-due').value;
+  const recur = document.getElementById('f-recur').value;
+  if(!name || isNaN(amount) || amount<=0 || !due){
+    alert('Please fill in name, a valid amount, and due date.');
+    return;
+  }
+  bills.push({ id: nextId++, name, amount, cat, due, recur, paidDate: null });
+  save(bills); render();
+  document.getElementById('add-overlay').classList.remove('open');
+  document.getElementById('f-name').value='';
+  document.getElementById('f-amount').value='';
+});
+
+render();
+</script>
+</body>
+</html>

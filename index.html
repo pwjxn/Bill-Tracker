@@ -4,52 +4,33 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Bills" />
 <title>Bills</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #f7f7f5;
-    --surface: #ffffff;
-    --surface2: #f0efed;
-    --border: rgba(0,0,0,0.09);
-    --border-med: rgba(0,0,0,0.15);
-    --text: #1a1a18;
-    --text2: #6b6b65;
-    --text3: #a0a09a;
-    --accent: #1a1a18;
-    --green: #1e7f4e;
-    --green-bg: #eaf5ee;
-    --amber: #8a5a00;
-    --amber-bg: #fef5e0;
-    --red: #c0291e;
-    --red-bg: #fdecea;
-    --radius: 14px;
-    --radius-sm: 9px;
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --surface2: #1e1e24;
+    --border: rgba(255,255,255,0.07);
+    --border-med: rgba(255,255,255,0.13);
+    --text: #eeeef0;
+    --text2: #8a8a96;
+    --text3: #4a4a55;
+    --accent: #7c6cf5;
+    --accent-text: #ffffff;
+    --green: #3dd68c;
+    --green-bg: #0b2a1c;
+    --amber: #f5a623;
+    --amber-bg: #271a02;
+    --red: #f06a6a;
+    --red-bg: #2a0f0f;
+    --radius: 16px;
+    --radius-sm: 10px;
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #111110;
-      --surface: #1c1c1a;
-      --surface2: #252523;
-      --border: rgba(255,255,255,0.08);
-      --border-med: rgba(255,255,255,0.14);
-      --text: #f0efe9;
-      --text2: #9a9a92;
-      --text3: #5a5a54;
-      --accent: #f0efe9;
-      --green: #4ade86;
-      --green-bg: #0d2e1c;
-      --amber: #f0b429;
-      --amber-bg: #2a1f00;
-      --red: #f56a63;
-      --red-bg: #2d0e0c;
-    }
   }
 
   html, body {
@@ -93,7 +74,7 @@
     width: 36px; height: 36px;
     border-radius: 50%;
     background: var(--accent);
-    color: var(--bg);
+    color: var(--accent-text);
     border: none;
     font-size: 22px;
     line-height: 1;
@@ -146,7 +127,7 @@
   }
   .filter-btn.active {
     background: var(--accent);
-    color: var(--bg);
+    color: var(--accent-text);
     border-color: var(--accent);
   }
 
@@ -257,7 +238,7 @@
   .btn-save {
     width: 100%;
     background: var(--accent);
-    color: var(--bg);
+    color: var(--accent-text);
     border: none;
     border-radius: var(--radius-sm);
     padding: 15px;
